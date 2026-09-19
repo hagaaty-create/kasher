@@ -1,22 +1,19 @@
 /* ==========================================================================
    TADBEER POS - LOCAL DATABASE & SEED DATA MANAGEMENT
-   Handles offline data storage, local state, and initial mock data
    ========================================================================== */
 
 const DEFAULT_SETTINGS = {
   storeName: 'مطعم أبو العز - شاورما وكريب',
   storePhone: '01012345678 - 01287654321',
   storeAddress: 'شارع الجامعة - بجوار المحطة - القاهرة',
-  taxRate: 14,
+  taxRate: 0, // Tax removed as requested
   currency: 'ج.م',
   selectedPrinter: 'POS-80 Printer',
   paperSize: '80mm',
   printCopies: 1,
   autoPrintCheckout: true,
   autoOpenCashDrawer: true,
-  printKitchenTicket: true,
-  receiptFooter: 'شكراً لزيارتكم - نتشرف بحضوركم دائماً',
-  kitchenPrinter: 'Kitchen Thermal Printer'
+  receiptFooter: 'شكراً لزيارتكم - نتشرف بحضوركم دائماً'
 };
 
 const INITIAL_CATEGORIES = [
@@ -60,7 +57,7 @@ const INITIAL_SHIFT = {
   openedAt: new Date().toLocaleString('ar-EG'),
   closedAt: null,
   cashierName: 'أحمد كاشير',
-  openingCash: 500.00,
+  openingCash: 0.00,
   status: 'open'
 };
 
@@ -94,10 +91,13 @@ class DBService {
   }
 
   getSettings() {
-    return JSON.parse(localStorage.getItem('pos_settings'));
+    let s = JSON.parse(localStorage.getItem('pos_settings'));
+    s.taxRate = 0; // Force 0 tax
+    return s;
   }
 
   saveSettings(settings) {
+    settings.taxRate = 0;
     localStorage.setItem('pos_settings', JSON.stringify(settings));
   }
 
@@ -161,12 +161,13 @@ class DBService {
   addCashMovement(movement) {
     let list = this.getCashMovements();
     movement.id = Date.now();
+    movement.timestamp = new Date().toISOString();
     movement.date = new Date().toLocaleString('ar-EG');
     list.unshift(movement);
     localStorage.setItem('pos_cash_movements', JSON.stringify(list));
   }
 
-  closeShift(closingActualCash, notes) {
+  closeShiftAndZeroDrawer(closingActualCash, notes) {
     let shift = this.getActiveShift();
     if (!shift) return null;
 
@@ -185,6 +186,7 @@ class DBService {
     const shiftReport = {
       ...shift,
       closedAt: new Date().toLocaleString('ar-EG'),
+      closedAtIso: new Date().toISOString(),
       status: 'closed',
       totalOrders: orders.length,
       cashSales: cashSales,
@@ -199,16 +201,18 @@ class DBService {
       notes: notes
     };
 
+    // Store in history
     let history = JSON.parse(localStorage.getItem('pos_shifts_history')) || [];
     history.unshift(shiftReport);
     localStorage.setItem('pos_shifts_history', JSON.stringify(history));
 
+    // Zero out cash drawer for next shift
     const newShift = {
       id: shift.id + 1,
       openedAt: new Date().toLocaleString('ar-EG'),
       closedAt: null,
       cashierName: shift.cashierName,
-      openingCash: closingActualCash,
+      openingCash: 0.00, // صفر الدرج تماماً لليوم/الوردية الجديدة
       status: 'open'
     };
     this.saveActiveShift(newShift);

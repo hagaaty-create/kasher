@@ -35,16 +35,6 @@ class AppEngine {
         this.confirmCheckoutAndPrint();
       }
     });
-
-    // Auto KDS Timers refresh every 2 seconds
-    setInterval(() => {
-      const activeScreen = document.querySelector('.screen-container.active');
-      if (activeScreen && activeScreen.id === 'kds-screen') {
-        if (typeof kdsManager !== 'undefined') {
-          kdsManager.renderKDSGrid(document.getElementById('kds-grid-container'));
-        }
-      }
-    }, 2000);
   }
 
   switchScreen(screenId) {
@@ -75,8 +65,8 @@ class AppEngine {
     }
 
     // Screen specific triggers
-    if (screenId === 'kds-screen' && typeof kdsManager !== 'undefined') {
-      kdsManager.renderKDSGrid(document.getElementById('kds-grid-container'));
+    if (screenId === 'kds-screen' && typeof adminDashboard !== 'undefined') {
+      adminDashboard.renderAdminDashboard(document.getElementById('admin-dashboard-container'));
     } else if (screenId === 'reports-screen' && typeof reportsManager !== 'undefined') {
       reportsManager.renderDashboard(document.getElementById('reports-screen'));
     } else if (screenId === 'active-orders-screen') {
@@ -181,7 +171,7 @@ class AppEngine {
           <div>السلة فارغة حالياً</div>
         </div>
       `;
-      this.updateCartTotals(0, 0, 0);
+      this.updateCartTotals(0, 0);
       return;
     }
 
@@ -202,17 +192,14 @@ class AppEngine {
       </div>
     `).join('');
 
-    const settings = db.getSettings();
     const subtotal = this.cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-    const tax = subtotal * (settings.taxRate / 100);
-    const total = subtotal + tax - this.discountAmount;
+    const total = subtotal - this.discountAmount;
 
-    this.updateCartTotals(subtotal, tax, total);
+    this.updateCartTotals(subtotal, total);
   }
 
-  updateCartTotals(subtotal, tax, total) {
+  updateCartTotals(subtotal, total) {
     document.getElementById('cart-subtotal').innerText = `${subtotal.toFixed(2)} ج.م`;
-    document.getElementById('cart-tax').innerText = `${tax.toFixed(2)} ج.م`;
     document.getElementById('cart-total').innerText = `${Math.max(0, total).toFixed(2)} ج.م`;
   }
 
@@ -221,10 +208,8 @@ class AppEngine {
       showToast('يرجى إضافة أصناف إلى السلة أولاً', 'warning');
       return;
     }
-    const settings = db.getSettings();
     const subtotal = this.cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-    const tax = subtotal * (settings.taxRate / 100);
-    const total = subtotal + tax - this.discountAmount;
+    const total = subtotal - this.discountAmount;
 
     document.getElementById('checkout-total-val').innerText = `${total.toFixed(2)} ج.م`;
     document.getElementById('modal-paid-input').value = Math.ceil(total);
@@ -253,20 +238,16 @@ class AppEngine {
   }
 
   calculateChange() {
-    const settings = db.getSettings();
     const subtotal = this.cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-    const tax = subtotal * (settings.taxRate / 100);
-    const total = subtotal + tax - this.discountAmount;
+    const total = subtotal - this.discountAmount;
     const paid = parseFloat(document.getElementById('modal-paid-input').value) || 0;
     const change = Math.max(0, paid - total);
     document.getElementById('checkout-change-val').innerText = `${change.toFixed(2)} ج.م`;
   }
 
   async confirmCheckoutAndPrint() {
-    const settings = db.getSettings();
     const subtotal = this.cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-    const tax = subtotal * (settings.taxRate / 100);
-    const total = subtotal + tax - this.discountAmount;
+    const total = subtotal - this.discountAmount;
     const paid = parseFloat(document.getElementById('modal-paid-input').value) || total;
 
     const orderTypeMap = { takeaway: 'تيك أواي', dinein: 'صالة', delivery: 'توصيل' };
@@ -283,22 +264,20 @@ class AppEngine {
       paymentMethodAr: payMap[this.paymentMethod],
       items: [...this.cart],
       subtotal: subtotal,
-      tax: tax,
+      tax: 0,
       discount: this.discountAmount,
       total: total,
       paidAmount: paid,
       changeAmount: Math.max(0, paid - total),
-      status: 'new',
+      status: 'delivered',
       notes: document.getElementById('order-notes-input').value || ''
     };
 
     // Save to DB
     db.saveOrder(order);
 
-    // Play Sound & Print Receipts
-    kdsManager.playOrderAlertSound();
+    // Print Receipt
     await printService.printOrderReceipt(order);
-    await printService.printKitchenTicket(order);
 
     this.closeCheckoutModal();
     this.clearCart();
@@ -307,7 +286,6 @@ class AppEngine {
 
   updateStatus(orderId, newStatus) {
     db.updateOrderStatus(orderId, newStatus);
-    kdsManager.renderKDSGrid(document.getElementById('kds-grid-container'));
     if (document.getElementById('active-orders-screen').classList.contains('active')) {
       this.renderActiveOrders();
     }
@@ -324,7 +302,6 @@ class AppEngine {
           <span>${o.date}</span>
         </div>
         <div class="card-body-items">
-          <div><strong>الحالة:</strong> ${o.status === 'new' ? 'جديد 🟡' : (o.status === 'cooking' ? 'قيد التحضير 🔵' : 'جاهز 🟢')}</div>
           <div><strong>الإجمالي:</strong> ${o.total.toFixed(2)} ج.م</div>
           <div><strong>طريقة الدفع:</strong> ${o.paymentMethodAr}</div>
         </div>

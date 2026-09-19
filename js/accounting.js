@@ -20,7 +20,7 @@ class AccountingManager {
 
     container.innerHTML = `
       <div style="padding: 24px; overflow-y: auto; width: 100%;">
-        <h2 style="margin-bottom: 20px; color: var(--gold); font-weight: 800;"><i class="fas fa-vault"></i> تقفيل الوردية وحسابات الدرج (Shift Management)</h2>
+        <h2 style="margin-bottom: 20px; color: var(--gold); font-weight: 800;"><i class="fas fa-vault"></i> تقفيل اليوم والوردية وحسابات الدرج (تصفير الدرج)</h2>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
           
@@ -58,13 +58,13 @@ class AccountingManager {
             </div>
 
             <div style="border-top: 1px dashed var(--border-color); padding-top: 14px; margin-top: 14px;">
-              <h4 style="margin-bottom: 10px;">مبيعات الطرق الأخري (غير الكاش):</h4>
+              <h4 style="margin-bottom: 10px;">مبيعات الطرق الأخرى:</h4>
               <div class="drawer-metric"><span>مبيعات فيزا / بطاقات:</span><span class="drawer-metric-val">${cardSales.toFixed(2)} ج.م</span></div>
-              <div class="drawer-metric"><span>مبيعات محفظة إلكترونية:</span><span class="drawer-metric-val">${walletSales.toFixed(2)} ج.m</span></div>
+              <div class="drawer-metric"><span>مبيعات محفظة إلكترونية:</span><span class="drawer-metric-val">${walletSales.toFixed(2)} ج.م</span></div>
             </div>
 
             <button class="btn btn-gold" style="width:100%; margin-top: 20px; padding: 14px; font-size: 16px;" onclick="accountingManager.openCloseShiftModal(${expectedCashInDrawer})">
-              🔒 تقفيل الوردية الحالية وتصفية الحسابات
+              🔒 تقفيل اليوم والوردية (تصفير الدرج كلياً)
             </button>
           </div>
 
@@ -143,10 +143,10 @@ class AccountingManager {
     const actualCash = parseFloat(document.getElementById('close-actual-cash-input').value) || 0;
     const notes = document.getElementById('close-shift-notes').value;
 
-    const report = db.closeShift(actualCash, notes);
+    const report = db.closeShiftAndZeroDrawer(actualCash, notes);
 
     document.getElementById('close-shift-modal').classList.remove('active');
-    showToast(`تم تقفيل الوردية رقم #${report.id} وتصفية الحسابات بنجاح!`, 'success');
+    showToast(`تم تقفيل اليوم والوردية وتصفير الدرج بنجاح!`, 'success');
     
     // Print Shift Closing Receipt
     printService.printViaIframe(`
@@ -156,16 +156,16 @@ class AccountingManager {
       <body>
         <div class="receipt-container">
           <div class="receipt-header">
-            <div class="store-title">تقرير تقفيل وردية #${report.id}</div>
+            <div class="store-title">تقرير تقفيل اليوم والوردية #${report.id}</div>
             <div class="store-sub">تاريخ الإغلاق: ${report.closedAt}</div>
           </div>
           <div class="receipt-divider"></div>
-          <div class="receipt-info-row"><span>المبيعات النقدية:</span><span>${report.cashSales.toFixed(2)}</span></div>
-          <div class="receipt-info-row"><span>الرصيد المتوقع:</span><span>${report.expectedCash.toFixed(2)}</span></div>
-          <div class="receipt-info-row"><span>الفعلي بالدرج:</span><span>${report.actualCash.toFixed(2)}</span></div>
-          <div class="receipt-info-row"><span>العجز / الزيادة:</span><span>${report.difference.toFixed(2)}</span></div>
+          <div class="receipt-info-row"><span>المبيعات النقدية:</span><span>${report.cashSales.toFixed(2)} ج.م</span></div>
+          <div class="receipt-info-row"><span>الرصيد المتوقع:</span><span>${report.expectedCash.toFixed(2)} ج.م</span></div>
+          <div class="receipt-info-row"><span>الفعلي بالدرج:</span><span>${report.actualCash.toFixed(2)} ج.م</span></div>
+          <div class="receipt-info-row"><span>العجز / الزيادة:</span><span>${report.difference.toFixed(2)} ج.م</span></div>
           <div class="receipt-divider"></div>
-          <div style="text-align:center;">تم تسليم الوردية وتصفية الحسابات</div>
+          <div style="text-align:center; font-weight:bold;">تم تسليم الوردية وتصفير الدرج لليوم الجديد</div>
         </div>
       </body>
       </html>

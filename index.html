@@ -30,10 +30,10 @@
           <i class="fas fa-list-alt"></i> الطلبات الحالية
         </button>
         <button class="nav-btn" data-screen="kds-screen" onclick="app.switchScreen('kds-screen')">
-          <i class="fas fa-fire"></i> المطبخ (KDS)
+          <i class="fas fa-chart-pie"></i> لوحة الإدارة المالية
         </button>
         <button class="nav-btn" data-screen="shift-screen" onclick="app.switchScreen('shift-screen')">
-          <i class="fas fa-vault"></i> الوردية والدرج
+          <i class="fas fa-vault"></i> تقفيل اليوم والدرج
         </button>
         <button class="nav-btn" data-screen="products-admin-screen" onclick="app.switchScreen('products-admin-screen')">
           <i class="fas fa-utensils"></i> الأصناف والأسعار
@@ -84,7 +84,6 @@
 
           <div class="cart-summary">
             <div class="summary-row"><span>المجموع الفرعي:</span><span id="cart-subtotal">0.00 ج.م</span></div>
-            <div class="summary-row"><span>الضريبة (14%):</span><span id="cart-tax">0.00 ج.م</span></div>
             <div class="summary-row total"><span>الإجمالي:</span><span class="summary-total-val" id="cart-total">0.00 ج.م</span></div>
           </div>
 
@@ -104,12 +103,9 @@
         </div>
       </section>
 
-      <!-- 3. KITCHEN DISPLAY SCREEN (KDS) -->
+      <!-- 3. ADMIN FINANCIAL DASHBOARD (REPLACES KDS) -->
       <section id="kds-screen" class="screen-container">
-        <div style="padding: 20px; width: 100%;">
-          <h2 style="margin-bottom: 16px; color: var(--primary);">👨‍🍳 شاشة تحضير المطبخ (Real-Time KDS)</h2>
-          <div class="kds-grid" id="kds-grid-container"></div>
-        </div>
+        <div id="admin-dashboard-container" style="width: 100%;"></div>
       </section>
 
       <!-- 4. ACCOUNTING & SHIFT SCREEN -->
@@ -245,7 +241,7 @@
   <div class="modal-overlay" id="close-shift-modal">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">🔒 تقفيل الوردية وتصفية النقدية</div>
+        <div class="modal-title">🔒 تقفيل اليوم وتصفية الدرج كلياً</div>
         <button class="close-btn" onclick="document.getElementById('close-shift-modal').classList.remove('active')">&times;</button>
       </div>
       <div class="modal-body">
@@ -260,12 +256,12 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">ملاحظات تقفيل الوردية وتصفية الحسابات</label>
-          <textarea id="close-shift-notes" class="form-control" rows="2" placeholder="ملاحظات العجز والزيادة وتسليم العهدة..."></textarea>
+          <label class="form-label">ملاحظات تقفيل اليوم والوردية</label>
+          <textarea id="close-shift-notes" class="form-control" rows="2" placeholder="ملاحظات العجز والزيادة وتصفية حسابات اليوم..."></textarea>
         </div>
 
         <button class="btn btn-gold" style="width: 100%; padding: 14px; font-size: 16px;" onclick="accountingManager.confirmCloseShift()">
-          تأكيد إغلاق الوردية وطباعة التقرير
+          تأكيد إغلاق اليوم وتصفير الدرج
         </button>
       </div>
     </div>
