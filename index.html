@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام نقطة البيع الشامل - الشاورما والكريب</title>
+  <title>نظام الكاشير والحسابات الشامل - الشاورما والكريب</title>
   
   <!-- FontAwesome Icons & Google Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/pos.css">
+  <link rel="stylesheet" href="css/accounting.css">
   <link rel="stylesheet" href="css/print.css">
 </head>
 <body>
@@ -18,7 +19,7 @@
     <header class="top-navbar">
       <div class="brand-section">
         <div class="brand-logo"><i class="fas fa-utensils"></i></div>
-        <div class="brand-title">نظام تدبير - مطعم الشاورما والكريب</div>
+        <div class="brand-title">تدبير - كاشير وحسابات المطعم</div>
       </div>
 
       <nav class="nav-links">
@@ -29,13 +30,19 @@
           <i class="fas fa-list-alt"></i> الطلبات الحالية
         </button>
         <button class="nav-btn" data-screen="kds-screen" onclick="app.switchScreen('kds-screen')">
-          <i class="fas fa-fire"></i> شاشة المطبخ (KDS)
+          <i class="fas fa-fire"></i> المطبخ (KDS)
+        </button>
+        <button class="nav-btn" data-screen="shift-screen" onclick="app.switchScreen('shift-screen')">
+          <i class="fas fa-vault"></i> الوردية والدرج
+        </button>
+        <button class="nav-btn" data-screen="products-admin-screen" onclick="app.switchScreen('products-admin-screen')">
+          <i class="fas fa-utensils"></i> الأصناف والأسعار
         </button>
         <button class="nav-btn" data-screen="reports-screen" onclick="app.switchScreen('reports-screen')">
-          <i class="fas fa-chart-line"></i> التقارير والوردية
+          <i class="fas fa-chart-line"></i> المبيعات والتقارير
         </button>
         <button class="nav-btn" data-screen="settings-screen" onclick="app.switchScreen('settings-screen')">
-          <i class="fas fa-sliders-h"></i> إعدادات الطابعة
+          <i class="fas fa-sliders-h"></i> الطابعة
         </button>
       </nav>
 
@@ -55,48 +62,30 @@
 
       <!-- 1. MAIN POS SCREEN -->
       <section id="main-pos-screen" class="screen-container pos-screen active">
-        <!-- Categories Sidebar -->
-        <aside class="categories-sidebar" id="categories-list">
-          <!-- Filled Dynamically -->
-        </aside>
+        <aside class="categories-sidebar" id="categories-list"></aside>
 
-        <!-- Center Product Catalog -->
         <section class="products-section">
           <div class="search-bar-container">
             <div class="search-input-wrapper">
               <i class="fas fa-search"></i>
-              <input type="text" class="form-control" placeholder="ابحث عن صنف بالشاورما، الكريب، المشروبات..." oninput="app.renderProducts(this.value)">
+              <input type="text" class="form-control" placeholder="ابحث عن صنف..." oninput="app.renderProducts(this.value)">
             </div>
           </div>
-          <div class="products-grid" id="products-grid">
-            <!-- Filled Dynamically -->
-          </div>
+          <div class="products-grid" id="products-grid"></div>
         </section>
 
-        <!-- Left Cart Sidebar -->
         <aside class="cart-sidebar">
           <div class="cart-header">
-            <div class="cart-title"><i class="fas fa-shopping-cart"></i> سلة الطلب الحالية</div>
+            <div class="cart-title"><i class="fas fa-shopping-cart"></i> سلة الطلب</div>
             <button class="clear-cart-btn" onclick="app.clearCart()"><i class="fas fa-trash"></i> تفريغ</button>
           </div>
 
-          <div class="cart-items-list" id="cart-items-container">
-            <!-- Filled Dynamically -->
-          </div>
+          <div class="cart-items-list" id="cart-items-container"></div>
 
           <div class="cart-summary">
-            <div class="summary-row">
-              <span>المجموع الفرعي:</span>
-              <span id="cart-subtotal">0.00 ج.م</span>
-            </div>
-            <div class="summary-row">
-              <span>الضريبة (14%):</span>
-              <span id="cart-tax">0.00 ج.م</span>
-            </div>
-            <div class="summary-row total">
-              <span>الإجمالي النهائي:</span>
-              <span class="summary-total-val" id="cart-total">0.00 ج.م</span>
-            </div>
+            <div class="summary-row"><span>المجموع الفرعي:</span><span id="cart-subtotal">0.00 ج.م</span></div>
+            <div class="summary-row"><span>الضريبة (14%):</span><span id="cart-tax">0.00 ج.م</span></div>
+            <div class="summary-row total"><span>الإجمالي:</span><span class="summary-total-val" id="cart-total">0.00 ج.م</span></div>
           </div>
 
           <div class="cart-action-buttons">
@@ -123,15 +112,25 @@
         </div>
       </section>
 
-      <!-- 4. REPORTS SCREEN -->
+      <!-- 4. ACCOUNTING & SHIFT SCREEN -->
+      <section id="shift-screen" class="screen-container">
+        <!-- Rendered by accountingManager -->
+      </section>
+
+      <!-- 5. PRODUCTS & PRICES ADMIN SCREEN -->
+      <section id="products-admin-screen" class="screen-container">
+        <!-- Rendered by productManager -->
+      </section>
+
+      <!-- 6. REPORTS SCREEN -->
       <section id="reports-screen" class="screen-container">
         <!-- Rendered by reportsManager -->
       </section>
 
-      <!-- 5. SETTINGS SCREEN -->
+      <!-- 7. SETTINGS SCREEN -->
       <section id="settings-screen" class="screen-container">
         <div style="padding: 30px; max-width: 600px; margin: 0 auto; width: 100%;">
-          <h2 style="margin-bottom: 20px; color: var(--gold);"><i class="fas fa-cogs"></i> إعدادات النظام والطابعة الحرارية</h2>
+          <h2 style="margin-bottom: 20px; color: var(--gold);"><i class="fas fa-cogs"></i> إعدادات الطابعة الحرارية</h2>
           <div class="form-group">
             <label class="form-label">اسم المطعم</label>
             <input type="text" id="setting-store-name" class="form-control">
@@ -162,7 +161,6 @@
         <button class="close-btn" onclick="app.closeCheckoutModal()">&times;</button>
       </div>
       <div class="modal-body">
-        
         <label class="form-label">نوع الطلب</label>
         <div class="order-type-selector">
           <button class="type-btn active" data-type="takeaway" onclick="app.setOrderType('takeaway')">
@@ -183,7 +181,7 @@
 
         <div id="delivery-info-group" class="form-group" style="display:none;">
           <label class="form-label">اسم العميل والعنوان</label>
-          <input type="text" class="form-control" placeholder="اسم العميل ورقم التليفون والعنوان بالتفصيل">
+          <input type="text" class="form-control" placeholder="اسم العميل ورقم التليفون والعنوان">
         </div>
 
         <label class="form-label">طريقة الدفع</label>
@@ -200,7 +198,7 @@
 
         <div class="calc-change-box">
           <div>
-            <div style="font-size: 13px; color: var(--text-muted);">المبلغ المتبقي للعميل (الباقي):</div>
+            <div style="font-size: 13px; color: var(--text-muted);">الباقي للعميل:</div>
             <div class="change-amount" id="checkout-change-val">0.00 ج.م</div>
           </div>
           <div>
@@ -210,14 +208,99 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">ملاحظات الطلب (إن وجدت)</label>
+          <label class="form-label">ملاحظات الطلب</label>
           <input type="text" id="order-notes-input" class="form-control" placeholder="مثال: بدون بصل، ثومية زيادة...">
         </div>
 
         <button class="btn btn-success" style="width: 100%; padding: 16px; font-size: 18px;" onclick="app.confirmCheckoutAndPrint()">
           <i class="fas fa-print"></i> تأكيد الدفع وطباعة الفاتورة (F9)
         </button>
+      </div>
+    </div>
+  </div>
 
+  <!-- CASH MOVEMENT MODAL (IN / OUT) -->
+  <div class="modal-overlay" id="cash-movement-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="movement-modal-title">تسجيل حركة نقدية بالدرج</div>
+        <button class="close-btn" onclick="document.getElementById('cash-movement-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="movement-type-val" value="in">
+        <div class="form-group">
+          <label class="form-label">المبلغ النزول/المسحوب (ج.م)</label>
+          <input type="number" id="movement-amount-input" class="form-control" placeholder="أدخل المبلغ...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">السبب / البيان التفصيلي</label>
+          <input type="text" id="movement-reason-input" class="form-control" placeholder="مثال: شراء كراتين بيض، إيداع فكة سريعة...">
+        </div>
+        <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="accountingManager.saveCashMovement()">حفظ الحركة وتحديث الدرج</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOSE SHIFT MODAL -->
+  <div class="modal-overlay" id="close-shift-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">🔒 تقفيل الوردية وتصفية النقدية</div>
+        <button class="close-btn" onclick="document.getElementById('close-shift-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 16px; background: var(--bg-input); padding: 12px; border-radius: 8px;">
+          <div>الرصيد المحسوب بالسيستم في الدرج:</div>
+          <div style="font-family: var(--font-mono); font-size: 24px; font-weight: 900; color: var(--success);" id="close-expected-cash">0.00 ج.م</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">المبلغ النظري الفعلي الموجود في الدرج (جرد يدوي)</label>
+          <input type="number" id="close-actual-cash-input" class="form-control" style="font-size: 20px; font-weight: bold; font-family: var(--font-mono);">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ملاحظات تقفيل الوردية وتصفية الحسابات</label>
+          <textarea id="close-shift-notes" class="form-control" rows="2" placeholder="ملاحظات العجز والزيادة وتسليم العهدة..."></textarea>
+        </div>
+
+        <button class="btn btn-gold" style="width: 100%; padding: 14px; font-size: 16px;" onclick="accountingManager.confirmCloseShift()">
+          تأكيد إغلاق الوردية وطباعة التقرير
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCT ADMIN EDIT MODAL -->
+  <div class="modal-overlay" id="product-admin-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="product-modal-title">إضافة / تعديل صنف</div>
+        <button class="close-btn" onclick="document.getElementById('product-admin-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="prod-modal-id">
+        <div class="form-group">
+          <label class="form-label">اسم الصنف</label>
+          <input type="text" id="prod-modal-name" class="form-control" placeholder="اسم ساندويتش أو كريب...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">القسم</label>
+          <select id="prod-modal-cat" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">السعر (ج.م)</label>
+          <input type="number" id="prod-modal-price" class="form-control" placeholder="أدخل السعر الجديد...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">رابط الصورة (URL)</label>
+          <input type="text" id="prod-modal-img" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">وصف الصنف</label>
+          <input type="text" id="prod-modal-desc" class="form-control" placeholder="المكونات والتفاصيل...">
+        </div>
+        <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="productManager.saveProductFromModal()">حفظ الصنف والسعر</button>
       </div>
     </div>
   </div>
@@ -232,6 +315,8 @@
   <script src="js/print-service.js"></script>
   <script src="js/kds.js"></script>
   <script src="js/reports.js"></script>
+  <script src="js/accounting.js"></script>
+  <script src="js/product-manager.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

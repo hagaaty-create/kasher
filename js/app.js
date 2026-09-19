@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TADBEER POS - APPLICATION CORE ENGINE (State, Cart & Navigation)
+   TADBEER POS - APPLICATION CORE ENGINE (Updated with Shift & Products Navigation)
    ========================================================================== */
 
 class AppEngine {
@@ -63,6 +63,10 @@ class AppEngine {
       this.renderActiveOrders();
     } else if (screenId === 'settings-screen') {
       this.loadSettingsScreen();
+    } else if (screenId === 'shift-screen') {
+      accountingManager.renderShiftScreen(document.getElementById('shift-screen'));
+    } else if (screenId === 'products-admin-screen') {
+      productManager.renderProductAdminScreen(document.getElementById('products-admin-screen'));
     }
   }
 
