@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TADBEER POS - APPLICATION CORE ENGINE (Updated with Shift & Products Navigation)
+   TADBEER POS - APPLICATION CORE ENGINE
    ========================================================================== */
 
 class AppEngine {
@@ -10,7 +10,6 @@ class AppEngine {
     this.orderType = 'takeaway';
     this.paymentMethod = 'cash';
     this.discountAmount = 0;
-    this.init();
   }
 
   init() {
@@ -25,6 +24,7 @@ class AppEngine {
     window.addEventListener('keydown', (e) => {
       if (e.key === 'F1') {
         e.preventDefault();
+        this.switchScreen('main-pos-screen');
         this.clearCart();
         showToast('تم فتح طلب جديد', 'info');
       } else if (e.key === 'F4') {
@@ -36,36 +36,56 @@ class AppEngine {
       }
     });
 
-    // Auto KDS Timers refresh every second
+    // Auto KDS Timers refresh every 2 seconds
     setInterval(() => {
       const activeScreen = document.querySelector('.screen-container.active');
       if (activeScreen && activeScreen.id === 'kds-screen') {
-        kdsManager.renderKDSGrid(document.getElementById('kds-grid-container'));
+        if (typeof kdsManager !== 'undefined') {
+          kdsManager.renderKDSGrid(document.getElementById('kds-grid-container'));
+        }
       }
     }, 2000);
   }
 
   switchScreen(screenId) {
-    document.querySelectorAll('.screen-container').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+    console.log("Switching to screen:", screenId);
+    
+    // Hide all screens
+    const allScreens = document.querySelectorAll('.screen-container');
+    allScreens.forEach(el => {
+      el.classList.remove('active');
+      el.style.display = 'none';
+    });
 
+    // Deactivate all nav buttons
+    const allNavBtns = document.querySelectorAll('.nav-btn');
+    allNavBtns.forEach(el => el.classList.remove('active'));
+
+    // Activate target screen
     const targetScreen = document.getElementById(screenId);
-    if (targetScreen) targetScreen.classList.add('active');
+    if (targetScreen) {
+      targetScreen.classList.add('active');
+      targetScreen.style.display = (screenId === 'main-pos-screen') ? 'flex' : 'block';
+    }
 
+    // Activate target nav button
     const targetNav = document.querySelector(`.nav-btn[data-screen="${screenId}"]`);
-    if (targetNav) targetNav.classList.add('active');
+    if (targetNav) {
+      targetNav.classList.add('active');
+    }
 
-    if (screenId === 'kds-screen') {
+    // Screen specific triggers
+    if (screenId === 'kds-screen' && typeof kdsManager !== 'undefined') {
       kdsManager.renderKDSGrid(document.getElementById('kds-grid-container'));
-    } else if (screenId === 'reports-screen') {
+    } else if (screenId === 'reports-screen' && typeof reportsManager !== 'undefined') {
       reportsManager.renderDashboard(document.getElementById('reports-screen'));
     } else if (screenId === 'active-orders-screen') {
       this.renderActiveOrders();
     } else if (screenId === 'settings-screen') {
       this.loadSettingsScreen();
-    } else if (screenId === 'shift-screen') {
+    } else if (screenId === 'shift-screen' && typeof accountingManager !== 'undefined') {
       accountingManager.renderShiftScreen(document.getElementById('shift-screen'));
-    } else if (screenId === 'products-admin-screen') {
+    } else if (screenId === 'products-admin-screen' && typeof productManager !== 'undefined') {
       productManager.renderProductAdminScreen(document.getElementById('products-admin-screen'));
     }
   }
@@ -334,6 +354,7 @@ class AppEngine {
 
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
+  if (!container) return;
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `<i class="fas fa-info-circle"></i> <span>${message}</span>`;
@@ -341,4 +362,9 @@ function showToast(message, type = 'info') {
   setTimeout(() => toast.remove(), 3500);
 }
 
-const app = new AppEngine();
+// Global App Instance Initialized On DOM Load
+let app;
+document.addEventListener('DOMContentLoaded', () => {
+  app = new AppEngine();
+  app.init();
+});
