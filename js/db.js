@@ -6,7 +6,7 @@ const DEFAULT_SETTINGS = {
   storeName: 'مطعم أبو العز - شاورما وكريب',
   storePhone: '01012345678 - 01287654321',
   storeAddress: 'شارع الجامعة - بجوار المحطة - القاهرة',
-  taxRate: 0, // Tax removed as requested
+  taxRate: 0,
   currency: 'ج.م',
   selectedPrinter: 'POS-80 Printer',
   paperSize: '80mm',
@@ -52,21 +52,23 @@ const INITIAL_PRODUCTS = [
   { id: 603, categoryId: 'drinks', name: 'زجاجة مياه معدنية', price: 10.00, desc: 'مياه طبيعية 500مل', img: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&q=80' }
 ];
 
-const INITIAL_SHIFT = {
-  id: 1001,
-  openedAt: new Date().toLocaleString('ar-EG'),
-  closedAt: null,
-  cashierName: 'أحمد كاشير',
-  openingCash: 0.00,
-  status: 'open'
-};
-
 class DBService {
   constructor() {
     this.init();
   }
 
   init() {
+    const now = new Date();
+    const defaultShift = {
+      id: 1001,
+      openedAt: now.toLocaleString('ar-EG'),
+      openedAtIso: now.toISOString(),
+      closedAt: null,
+      cashierName: 'أحمد كاشير',
+      openingCash: 0.00,
+      status: 'open'
+    };
+
     if (!localStorage.getItem('pos_settings')) {
       localStorage.setItem('pos_settings', JSON.stringify(DEFAULT_SETTINGS));
     }
@@ -80,7 +82,7 @@ class DBService {
       localStorage.setItem('pos_orders', JSON.stringify([]));
     }
     if (!localStorage.getItem('pos_active_shift')) {
-      localStorage.setItem('pos_active_shift', JSON.stringify(INITIAL_SHIFT));
+      localStorage.setItem('pos_active_shift', JSON.stringify(defaultShift));
     }
     if (!localStorage.getItem('pos_cash_movements')) {
       localStorage.setItem('pos_cash_movements', JSON.stringify([]));
@@ -92,7 +94,7 @@ class DBService {
 
   getSettings() {
     let s = JSON.parse(localStorage.getItem('pos_settings'));
-    s.taxRate = 0; // Force 0 tax
+    s.taxRate = 0;
     return s;
   }
 
@@ -171,7 +173,12 @@ class DBService {
     let shift = this.getActiveShift();
     if (!shift) return null;
 
-    const orders = this.getOrders();
+    const shiftStartTime = new Date(shift.openedAtIso || shift.openedAt).getTime();
+    const allOrders = this.getOrders();
+    
+    // Orders in THIS shift
+    const orders = allOrders.filter(o => new Date(o.createdAt).getTime() >= shiftStartTime);
+
     const cashSales = orders.reduce((acc, o) => o.paymentMethod === 'cash' ? acc + o.total : acc, 0);
     const cardSales = orders.reduce((acc, o) => o.paymentMethod === 'card' ? acc + o.total : acc, 0);
     const walletSales = orders.reduce((acc, o) => o.paymentMethod === 'wallet' ? acc + o.total : acc, 0);
@@ -201,18 +208,19 @@ class DBService {
       notes: notes
     };
 
-    // Store in history
     let history = JSON.parse(localStorage.getItem('pos_shifts_history')) || [];
     history.unshift(shiftReport);
     localStorage.setItem('pos_shifts_history', JSON.stringify(history));
 
-    // Zero out cash drawer for next shift
+    // START A FRESH NEW SHIFT & ZERO OUT DRAWER
+    const now = new Date();
     const newShift = {
       id: shift.id + 1,
-      openedAt: new Date().toLocaleString('ar-EG'),
+      openedAt: now.toLocaleString('ar-EG'),
+      openedAtIso: now.toISOString(),
       closedAt: null,
       cashierName: shift.cashierName,
-      openingCash: 0.00, // صفر الدرج تماماً لليوم/الوردية الجديدة
+      openingCash: 0.00, // صفر الدرج تماماً للوردية واليوم الجديد
       status: 'open'
     };
     this.saveActiveShift(newShift);

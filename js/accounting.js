@@ -6,7 +6,15 @@ class AccountingManager {
   renderShiftScreen(container) {
     if (!container) return;
     const shift = db.getActiveShift();
-    const orders = db.getOrders();
+    const shiftStartTime = new Date(shift.openedAtIso || shift.openedAt).getTime();
+
+    // Filter ONLY orders and movements created DURING THIS ACTIVE SHIFT
+    const allOrders = db.getOrders();
+    const orders = allOrders.filter(o => {
+      if (!shift.openedAtIso) return true;
+      return new Date(o.createdAt).getTime() >= shiftStartTime;
+    });
+
     const movements = db.getCashMovements();
 
     const cashSales = orders.reduce((acc, o) => o.paymentMethod === 'cash' ? acc + o.total : acc, 0);
@@ -20,7 +28,12 @@ class AccountingManager {
 
     container.innerHTML = `
       <div style="padding: 24px; overflow-y: auto; width: 100%;">
-        <h2 style="margin-bottom: 20px; color: var(--gold); font-weight: 800;"><i class="fas fa-vault"></i> تقفيل اليوم والوردية وحسابات الدرج (تصفير الدرج)</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="color: var(--gold); font-weight: 800;"><i class="fas fa-vault"></i> تقفيل اليوم والوردية وحسابات الدرج (تصفير الدرج)</h2>
+          <span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 8px; font-size: 13px; color: var(--secondary);">
+            بداية الوردية: ${shift.openedAt} (#${shift.id})
+          </span>
+        </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
           
@@ -32,7 +45,7 @@ class AccountingManager {
               <span class="drawer-metric-val" style="color: var(--gold);">${shift.openingCash.toFixed(2)} ج.م</span>
             </div>
             <div class="drawer-metric">
-              <span>+ مبيعات كاش الوردية:</span>
+              <span>+ مبيعات كاش الوردية الحالية:</span>
               <span class="drawer-metric-val" style="color: var(--success);">${cashSales.toFixed(2)} ج.م</span>
             </div>
             <div class="drawer-metric">
@@ -58,7 +71,7 @@ class AccountingManager {
             </div>
 
             <div style="border-top: 1px dashed var(--border-color); padding-top: 14px; margin-top: 14px;">
-              <h4 style="margin-bottom: 10px;">مبيعات الطرق الأخرى:</h4>
+              <h4 style="margin-bottom: 10px;">مبيعات الطرق الأخرى (الوردية الحالية):</h4>
               <div class="drawer-metric"><span>مبيعات فيزا / بطاقات:</span><span class="drawer-metric-val">${cardSales.toFixed(2)} ج.م</span></div>
               <div class="drawer-metric"><span>مبيعات محفظة إلكترونية:</span><span class="drawer-metric-val">${walletSales.toFixed(2)} ج.م</span></div>
             </div>
@@ -72,7 +85,7 @@ class AccountingManager {
 
         <!-- Cash Movements Log Table -->
         <div style="background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
-          <div style="padding: 16px; border-bottom: 1px solid var(--border-color); font-weight: 800;">سجل حركة الدرج (سحب وإيداع)</div>
+          <div style="padding: 16px; border-bottom: 1px solid var(--border-color); font-weight: 800;">سجل حركة الدرج للوردية الحالية</div>
           <table class="admin-table">
             <thead>
               <tr>
