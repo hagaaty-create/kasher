@@ -1,0 +1,557 @@
+/* ==========================================================================
+   TADBEER POS - POS SCREEN STYLES (Main POS, Active Orders, KDS, Reports)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. MAIN POS SCREEN LAYOUT
+   -------------------------------------------------------------------------- */
+.pos-screen {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Right Sidebar: Categories */
+.categories-sidebar {
+  width: var(--categories-width);
+  background: var(--bg-sidebar);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 8px;
+  overflow-y: auto;
+}
+
+.category-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px 6px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-btn i {
+  font-size: 22px;
+}
+
+.category-btn span {
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.category-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-highlight);
+}
+
+.category-btn.active {
+  background: linear-gradient(135deg, var(--primary), #b82331);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+}
+
+/* Center Content: Search & Products Grid */
+.products-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow: hidden;
+  background: var(--bg-main);
+}
+
+.search-bar-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.search-input-wrapper i {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.search-input-wrapper input {
+  padding-right: 42px;
+}
+
+.products-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
+  overflow-y: auto;
+  padding-left: 6px;
+}
+
+/* Product Card Touch-Friendly */
+.product-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--secondary);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.product-card:active {
+  transform: scale(0.97);
+}
+
+.product-img {
+  width: 100%;
+  height: 95px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: #252525;
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.product-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.product-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.product-price {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.add-btn-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+}
+
+/* Left Sidebar: Order Cart */
+.cart-sidebar {
+  width: var(--cart-width);
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cart-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cart-title {
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clear-cart-btn {
+  background: transparent;
+  border: none;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cart-items-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cart-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cart-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.cart-item-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cart-item-price {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-input);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  background: var(--bg-card-hover);
+  border: none;
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn:hover {
+  background: var(--primary);
+}
+
+.qty-val {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+
+.item-delete-btn {
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.item-delete-btn:hover {
+  color: var(--danger);
+}
+
+.cart-summary {
+  padding: 16px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+}
+
+.summary-row.total {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-primary);
+  border-top: 1px dashed var(--border-color);
+  padding-top: 8px;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.summary-total-val {
+  font-family: var(--font-mono);
+  color: var(--success);
+}
+
+.cart-action-buttons {
+  padding: 12px 16px;
+  background: var(--bg-sidebar);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-checkout {
+  grid-column: span 2;
+  padding: 16px;
+  font-size: 18px;
+}
+
+/* --------------------------------------------------------------------------
+   2. CHECKOUT MODAL STYLES
+   -------------------------------------------------------------------------- */
+.order-type-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.type-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.type-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.payment-methods {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.pay-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+
+.pay-btn.active {
+  background: var(--gold);
+  color: #000;
+  border-color: var(--gold);
+}
+
+.calc-change-box {
+  background: var(--bg-input);
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.change-amount {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--success);
+}
+
+/* --------------------------------------------------------------------------
+   3. ACTIVE ORDERS SCREEN & KDS SCREEN
+   -------------------------------------------------------------------------- */
+.orders-grid, .kds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 20px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.order-card, .kds-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.order-card.new, .kds-card.new { border-color: var(--warning); }
+.order-card.cooking, .kds-card.cooking { border-color: var(--info); }
+.order-card.ready, .kds-card.ready { border-color: var(--success); }
+
+.card-header-banner {
+  padding: 10px 14px;
+  background: var(--bg-input);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-id {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.order-timer {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  background: rgba(0,0,0,0.4);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.card-body-items {
+  padding: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kds-item-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.kds-item-qty {
+  color: var(--primary);
+  font-family: var(--font-mono);
+}
+
+.card-footer-actions {
+  padding: 12px;
+  background: var(--bg-input);
+  display: flex;
+  gap: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   4. LOGIN SCREEN
+   -------------------------------------------------------------------------- */
+.login-screen {
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at center, #262626 0%, #121212 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  width: 400px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-logo {
+  text-align: center;
+}
+
+.login-logo i {
+  font-size: 48px;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.login-logo h1 {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.role-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.role-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  font-size: 13px;
+}
+
+.role-btn.active {
+  background: var(--primary);
+  color: white;
+}

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام نقطة البيع الشامل - الشاورما والكريب</title>
+  
+  <!-- FontAwesome Icons & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/pos.css">
+  <link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+
+  <div id="app">
+    <!-- Top Navigation Bar -->
+    <header class="top-navbar">
+      <div class="brand-section">
+        <div class="brand-logo"><i class="fas fa-utensils"></i></div>
+        <div class="brand-title">نظام تدبير - مطعم الشاورما والكريب</div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" data-screen="main-pos-screen" onclick="app.switchScreen('main-pos-screen')">
+          <i class="fas fa-cash-register"></i> الكاشير (F1)
+        </button>
+        <button class="nav-btn" data-screen="active-orders-screen" onclick="app.switchScreen('active-orders-screen')">
+          <i class="fas fa-list-alt"></i> الطلبات الحالية
+        </button>
+        <button class="nav-btn" data-screen="kds-screen" onclick="app.switchScreen('kds-screen')">
+          <i class="fas fa-fire"></i> شاشة المطبخ (KDS)
+        </button>
+        <button class="nav-btn" data-screen="reports-screen" onclick="app.switchScreen('reports-screen')">
+          <i class="fas fa-chart-line"></i> التقارير والوردية
+        </button>
+        <button class="nav-btn" data-screen="settings-screen" onclick="app.switchScreen('settings-screen')">
+          <i class="fas fa-sliders-h"></i> إعدادات الطابعة
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <div class="status-badge">
+          <span class="status-dot"></span> QZ Tray: متصل
+        </div>
+        <div class="user-pill">
+          <div class="user-avatar">أ</div>
+          <span>أحمد (كاشير)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Screens Container -->
+    <main style="flex:1; position:relative; overflow:hidden;">
+
+      <!-- 1. MAIN POS SCREEN -->
+      <section id="main-pos-screen" class="screen-container pos-screen active">
+        <!-- Categories Sidebar -->
+        <aside class="categories-sidebar" id="categories-list">
+          <!-- Filled Dynamically -->
+        </aside>
+
+        <!-- Center Product Catalog -->
+        <section class="products-section">
+          <div class="search-bar-container">
+            <div class="search-input-wrapper">
+              <i class="fas fa-search"></i>
+              <input type="text" class="form-control" placeholder="ابحث عن صنف بالشاورما، الكريب، المشروبات..." oninput="app.renderProducts(this.value)">
+            </div>
+          </div>
+          <div class="products-grid" id="products-grid">
+            <!-- Filled Dynamically -->
+          </div>
+        </section>
+
+        <!-- Left Cart Sidebar -->
+        <aside class="cart-sidebar">
+          <div class="cart-header">
+            <div class="cart-title"><i class="fas fa-shopping-cart"></i> سلة الطلب الحالية</div>
+            <button class="clear-cart-btn" onclick="app.clearCart()"><i class="fas fa-trash"></i> تفريغ</button>
+          </div>
+
+          <div class="cart-items-list" id="cart-items-container">
+            <!-- Filled Dynamically -->
+          </div>
+
+          <div class="cart-summary">
+            <div class="summary-row">
+              <span>المجموع الفرعي:</span>
+              <span id="cart-subtotal">0.00 ج.م</span>
+            </div>
+            <div class="summary-row">
+              <span>الضريبة (14%):</span>
+              <span id="cart-tax">0.00 ج.م</span>
+            </div>
+            <div class="summary-row total">
+              <span>الإجمالي النهائي:</span>
+              <span class="summary-total-val" id="cart-total">0.00 ج.م</span>
+            </div>
+          </div>
+
+          <div class="cart-action-buttons">
+            <button class="btn btn-success btn-checkout" onclick="app.openCheckoutModal()">
+              <i class="fas fa-paper-plane"></i> إتمام الطلب والدفع (F4)
+            </button>
+          </div>
+        </aside>
+      </section>
+
+      <!-- 2. ACTIVE ORDERS SCREEN -->
+      <section id="active-orders-screen" class="screen-container">
+        <div style="padding: 20px; width: 100%;">
+          <h2 style="margin-bottom: 16px; color: var(--secondary);">📋 متابعة الطلبات الحالية</h2>
+          <div class="orders-grid" id="active-orders-grid"></div>
+        </div>
+      </section>
+
+      <!-- 3. KITCHEN DISPLAY SCREEN (KDS) -->
+      <section id="kds-screen" class="screen-container">
+        <div style="padding: 20px; width: 100%;">
+          <h2 style="margin-bottom: 16px; color: var(--primary);">👨‍🍳 شاشة تحضير المطبخ (Real-Time KDS)</h2>
+          <div class="kds-grid" id="kds-grid-container"></div>
+        </div>
+      </section>
+
+      <!-- 4. REPORTS SCREEN -->
+      <section id="reports-screen" class="screen-container">
+        <!-- Rendered by reportsManager -->
+      </section>
+
+      <!-- 5. SETTINGS SCREEN -->
+      <section id="settings-screen" class="screen-container">
+        <div style="padding: 30px; max-width: 600px; margin: 0 auto; width: 100%;">
+          <h2 style="margin-bottom: 20px; color: var(--gold);"><i class="fas fa-cogs"></i> إعدادات النظام والطابعة الحرارية</h2>
+          <div class="form-group">
+            <label class="form-label">اسم المطعم</label>
+            <input type="text" id="setting-store-name" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم الهاتف والعنوان</label>
+            <input type="text" id="setting-store-phone" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">اسم طابعة الفواتير (QZ Tray / POS Printer)</label>
+            <input type="text" id="setting-printer-name" class="form-control">
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-primary" onclick="app.saveSettingsFromForm()">حفظ الإعدادات</button>
+            <button class="btn btn-gold" onclick="printService.testPrint()">🖨️ طباعة صفحة تجريبية</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- CHECKOUT MODAL -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">إتمام الطلب وتحديد الدفع</div>
+        <button class="close-btn" onclick="app.closeCheckoutModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <label class="form-label">نوع الطلب</label>
+        <div class="order-type-selector">
+          <button class="type-btn active" data-type="takeaway" onclick="app.setOrderType('takeaway')">
+            <i class="fas fa-shopping-bag"></i> تيك أواي
+          </button>
+          <button class="type-btn" data-type="dinein" onclick="app.setOrderType('dinein')">
+            <i class="fas fa-utensils"></i> صالة
+          </button>
+          <button class="type-btn" data-type="delivery" onclick="app.setOrderType('delivery')">
+            <i class="fas fa-motorcycle"></i> توصيل
+          </button>
+        </div>
+
+        <div id="table-no-group" class="form-group" style="display:none;">
+          <label class="form-label">رقم الطاولة</label>
+          <input type="text" class="form-control" placeholder="أدخل رقم الطاولة (مثال: T4)">
+        </div>
+
+        <div id="delivery-info-group" class="form-group" style="display:none;">
+          <label class="form-label">اسم العميل والعنوان</label>
+          <input type="text" class="form-control" placeholder="اسم العميل ورقم التليفون والعنوان بالتفصيل">
+        </div>
+
+        <label class="form-label">طريقة الدفع</label>
+        <div class="payment-methods">
+          <button class="pay-btn active" data-pay="cash" onclick="app.setPaymentMethod('cash')">كاش 💵</button>
+          <button class="pay-btn" data-pay="card" onclick="app.setPaymentMethod('card')">بطاقة 💳</button>
+          <button class="pay-btn" data-pay="wallet" onclick="app.setPaymentMethod('wallet')">محفظة 📱</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">المبلغ المدفوع كاش</label>
+          <input type="number" id="modal-paid-input" class="form-control" style="font-size: 20px; font-weight: bold; font-family: var(--font-mono);" oninput="app.calculateChange()">
+        </div>
+
+        <div class="calc-change-box">
+          <div>
+            <div style="font-size: 13px; color: var(--text-muted);">المبلغ المتبقي للعميل (الباقي):</div>
+            <div class="change-amount" id="checkout-change-val">0.00 ج.م</div>
+          </div>
+          <div>
+            <div style="font-size: 13px; color: var(--text-muted);">إجمالي الفاتورة:</div>
+            <div style="font-size: 18px; font-weight: bold; font-family: var(--font-mono); color: var(--gold);" id="checkout-total-val">0.00 ج.م</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ملاحظات الطلب (إن وجدت)</label>
+          <input type="text" id="order-notes-input" class="form-control" placeholder="مثال: بدون بصل، ثومية زيادة...">
+        </div>
+
+        <button class="btn btn-success" style="width: 100%; padding: 16px; font-size: 18px;" onclick="app.confirmCheckoutAndPrint()">
+          <i class="fas fa-print"></i> تأكيد الدفع وطباعة الفاتورة (F9)
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- JavaScript Scripts -->
+  <script src="js/qz-tray.js"></script>
+  <script src="js/escpos-commands.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/print-service.js"></script>
+  <script src="js/kds.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
